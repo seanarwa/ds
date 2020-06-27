@@ -7,31 +7,45 @@ on:
     branches: [ master ]
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      DS_BUILD_DIR: ${{ github.workspace }}/build
+    strategy:
+      matrix:
+        os: [linux, windows]
+        arch: [386, amd64]
     steps:
-
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.14
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
-    - name: Build
-      run: go build -v .
-
-    - name: Test
-      run: go test -v .
+      - name: Setup Go 1.14
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.14
+        id: go
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Get Go dependencies
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+      - name: Create build directory
+        run: mkdir -p $DS_BUILD_DIR
+      - name: Go Build
+        run: go build -o $DS_BUILD_DIR -v .
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+      - name: Move conf
+        run: cp -rf conf $DS_BUILD_DIR/conf
+      - name: Check build directory
+        run: ls $DS_BUILD_DIR
+      - name: Set VERSION
+        run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
+      - name: Package built artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ds-${{ env.DS_VERSION }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ env.DS_BUILD_DIR }}/*
