@@ -18,8 +18,7 @@ jobs:
         id: go
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Set GOPATH
-        run: mkdir -p packages && export GOPATH=$(pwd)/packages
+      - run: mkdir -p packages
       - name: Get Go dependencies
         run: |
           go get -v -t -d ./...
@@ -27,17 +26,18 @@ jobs:
               curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
           fi
-      - name: Check packages
-        run: ls packages
+        env:
+          GOPATH: $(pwd)
+      - name: Check WORKDIR
+        run: ls
       - name: Go Build linux-amd64 
         run: go build -v .
+        env:
+          GOPATH: $(pwd)
+      - name: Check WORKDIR
+        run: ls
       - name: Package built artifact
         uses: actions/upload-artifact@v2
         with:
           name: ds
           path: ./ds
-      - name: Package source code
-        uses: actions/upload-artifact@v2
-        with:
-          name: ds-src 
-          path: ./
