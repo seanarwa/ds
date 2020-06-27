@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ds-${{ matrix.os }}-${{ matrix.arch }}
-          path: ${{ env.name }}/*
+          path: ${{ env.DS_BUILD_DIR }}/*
