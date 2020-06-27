@@ -42,8 +42,10 @@ jobs:
         run: cp -rf conf $DS_BUILD_DIR/conf
       - name: Check build directory
         run: ls $DS_BUILD_DIR
+      - name: Set VERSION
+        run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
       - name: Package built artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ds-${{ matrix.os }}-${{ matrix.arch }}
+          name: ds-${{ env.DS_VERSION }}-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ env.DS_BUILD_DIR }}/*
