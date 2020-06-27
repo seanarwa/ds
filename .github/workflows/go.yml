@@ -25,6 +25,8 @@ jobs:
               curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
           fi
+      - name: Check GOPATH
+        run: echo $GOPATH $GOROOT
       - name: Package setup
         uses: actions/upload-artifact@v2
         with:
