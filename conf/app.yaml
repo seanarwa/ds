@@ -1,0 +1,9 @@
+name: ds
+version: 1.0.0
+
+api:
+    port: 3000
+
+db:
+    mongo:
+        url: mongodb://localhost:27017

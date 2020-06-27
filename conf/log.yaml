@@ -1,0 +1,4 @@
+logging:
+    append: true
+    level: trace
+    file: log/main.log
