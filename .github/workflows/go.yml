@@ -10,9 +10,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      GOPATH: ${{ github.workspace }}
-      GO111MODULE: off
+#     env:
+#       GOPATH: ${{ github.workspace }}
+#       GO111MODULE: off
     strategy:
       matrix:
         os: [linux, windows]
