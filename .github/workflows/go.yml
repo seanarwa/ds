@@ -31,7 +31,8 @@ jobs:
           name: setup
           path: ./
   build:
-    name: Build 
+    name: Build
+    needs: [setup]
     runs-on: ubuntu-latest
     steps:
       - name: Unpackage setup
