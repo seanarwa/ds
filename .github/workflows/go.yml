@@ -32,21 +32,15 @@ jobs:
 
     - name: Build
       run: go build -v .
-
-    - name: Test
-      run: go test -v .
-  
-  package:
-    name: Package
-    runs-on: ubuntu-latest
-    steps:
-      - name: Package source code
-        uses: actions/upload-artifact@v2
-        with:
-          name: ds-src 
-          path: ./
-      - name: Package built artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ds
-          path: ./ds
+    
+    - name: Package source code
+      uses: actions/upload-artifact@v2
+      with:
+        name: ds-src 
+        path: ./
+    
+    - name: Package built artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ds
+        path: ./ds
