@@ -10,6 +10,13 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      GOPATH: ${{ github.workspace }}
+      GO111MODULE: off
+    strategy:
+      matrix:
+        os: [linux, windows]
+        arch: [386, amd64]
     steps:
       - name: Setup Go 1.14
         uses: actions/setup-go@v2
@@ -18,7 +25,6 @@ jobs:
         id: go
       - name: Check out code
         uses: actions/checkout@v2
-      - run: mkdir -p packages
       - name: Get Go dependencies
         run: |
           go get -v -t -d ./...
@@ -26,18 +32,15 @@ jobs:
               curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
           fi
-        env:
-          GOPATH: $(pwd)
-      - name: Check WORKDIR
-        run: ls
-      - name: Go Build linux-amd64 
+      - name: Go Build
         run: go build -v .
         env:
-          GOPATH: $(pwd)
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
       - name: Check WORKDIR
         run: ls
       - name: Package built artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ds
-          path: ./ds
+          name: ds-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./ds*
