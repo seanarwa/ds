@@ -34,7 +34,7 @@ jobs:
       - name: Create build directory
         run: mkdir -p $DS_BUILD_DIR
       - name: Go Build
-        run: go build -v .
+        run: go build -o $DS_BUILD_DIR -v .
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ds-${{ matrix.os }}-${{ matrix.arch }}
-          path: $DS_BUILD_DIR
+          path: $DS_BUILD_DIR/
