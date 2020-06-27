@@ -10,9 +10,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-#     env:
-#       GOPATH: ${{ github.workspace }}
-#       GO111MODULE: off
+    env:
+      DS_BUILD_DIR: ${{ github.workspace }}/build
     strategy:
       matrix:
         os: [linux, windows]
@@ -32,15 +31,19 @@ jobs:
               curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
           fi
+      - name: Create build directory
+        run: mkdir -p $DS_BUILD_DIR
       - name: Go Build
         run: go build -v .
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
-      - name: Check WORKDIR
-        run: ls
+      - name: Move conf
+        run: cp -rf conf $DS_BUILD_DIR/conf
+      - name: Check build directory
+        run: ls $DS_BUILD_DIR
       - name: Package built artifact
         uses: actions/upload-artifact@v2
         with:
           name: ds-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./ds*
+          path: $DS_BUILD_DIR
