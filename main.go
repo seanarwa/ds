@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"seanchang.me/ds/config"
-	"seanchang.me/ds/db/mongo"
+	"github.com/seanarwa/ds/config"
+	"github.com/seanarwa/ds/db/mongo"
 )
 
 func main() {

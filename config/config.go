@@ -1,9 +1,9 @@
 package config
 
 import (
+	"github.com/seanarwa/ds/logging"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"seanchang.me/ds/logging"
 )
 
 func Init() {
