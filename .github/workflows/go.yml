@@ -70,10 +70,11 @@ jobs:
           path: ${{ env.DS_BUILD_DIR }}/*
   build-docker:
     name: Build Docker
-    needs: [build]
     runs-on: ubuntu-latest
     env:
+      DS_DOCKER_REGISTRY: docker.pkg.github.com
       DS_GITHUB_REPO: ${{ github.repository }}
+      DS_DOCKER_IMAGE_NAME: ds
       DS_BUILD_DIR: ${{ github.workspace }}/build
     steps:
       - name: Setup - Install Go 1.14.x
@@ -86,9 +87,9 @@ jobs:
       - name: Setup - Set DS_VERSION
         run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
       - name: Setup - Set DS_DOCKER_TAG
-        run: echo "::set-env name=DS_DOCKER_TAG::docker.pkg.github.com/$DS_GITHUB_REPO:$DS_VERSION"
+        run: echo "::set-env name=DS_DOCKER_TAG::$DS_DOCKER_REGISTRY/$DS_GITHUB_REPO/$DS_DOCKER_IMAGE_NAME:$DS_VERSION"
       - name: Setup - Login to Docker Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $DS_DOCKER_REGISTRY -u ${{ github.actor }} --password-stdin
       - name: Setup - Create build directory
         run: mkdir -p $DS_BUILD_DIR
       - name: Setup - Move conf/ to build directory
