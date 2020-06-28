@@ -37,36 +37,34 @@ jobs:
         with:
           go-version: 1.14.x
         id: go
-      - name: Check out code
+      - name: Setup - Check out code
         uses: actions/checkout@v2
-      - name: Get Go dependencies
+      - name: Setup - Set DS_VERSION
+        run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
+      - name: Setup - Create build directory
+        run: mkdir -p $DS_BUILD_DIR
+      - name: Setup - Move conf/ to build directory
+        run: cp -rf conf $DS_BUILD_DIR/conf
+      - name: Setup - Substitute conf/app.yaml version
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'conf/app.yaml'
+        env:
+          version: ${{ env.DS_VERSION }}
+      - name: Build - Get Go dependencies
         run: |
           go get -v -t -d ./...
           if [ -f Gopkg.toml ]; then
               curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
           fi
-      - name: Create build directory
-        run: mkdir -p $DS_BUILD_DIR
-      - name: Go Build
+      - name: Build - Go Build
         run: go build -o $DS_BUILD_DIR -v .
         env:
           GOOS: ${{ matrix.platform.os }}
           GOARCH: ${{ matrix.platform.arch }}
-      - name: Move conf
-        run: cp -rf conf $DS_BUILD_DIR/conf
-      - name: Check build directory
-        run: ls $DS_BUILD_DIR
-      - name: Set VERSION
-        run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
-      - name: Substitute conf version
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: 'conf/app.yaml'
-        env:
-          version: ${{ env.DS_VERSION }}
-      - name: Package built artifact
+      - name: Package - Upload built artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.zip
+          name: ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
           path: ${{ env.DS_BUILD_DIR }}/*
