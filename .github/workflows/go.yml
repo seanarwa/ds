@@ -50,5 +50,5 @@ jobs:
       - name: Package built artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ds-${{ env.DS_VERSION }}-${{ matrix.os }}-${{ matrix.arch }}
+          name: ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
           path: ${{ env.DS_BUILD_DIR }}/*
