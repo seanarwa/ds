@@ -32,7 +32,7 @@ jobs:
           - os: linux
             arch: arm64
     steps:
-      - name: Install Go 1.14.x
+      - name: Setup - Install Go 1.14.x
         uses: actions/setup-go@v2
         with:
           go-version: 1.14.x
@@ -63,8 +63,53 @@ jobs:
         env:
           GOOS: ${{ matrix.platform.os }}
           GOARCH: ${{ matrix.platform.arch }}
-      - name: Package - Upload built artifacts
+      - name: Package - Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
           path: ${{ env.DS_BUILD_DIR }}/*
+  build-docker:
+    name: Build Docker
+    needs: [build]
+    runs-on: ubuntu-latest
+    env:
+      DS_GITHUB_REPO: ${{ github.repository }}
+      DS_BUILD_DIR: ${{ github.workspace }}/build
+    steps:
+      - name: Setup - Install Go 1.14.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
+        id: go
+      - name: Setup - Check out code
+        uses: actions/checkout@v2
+      - name: Setup - Set DS_VERSION
+        run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
+      - name: Setup - Set DS_DOCKER_TAG
+        run: echo "::set-env name=DS_DOCKER_TAG::docker.pkg.github.com/$DS_GITHUB_REPO:$DS_VERSION"
+      - name: Setup - Create build directory
+        run: mkdir -p $DS_BUILD_DIR
+      - name: Setup - Move conf/ to build directory
+        run: cp -rf conf $DS_BUILD_DIR/conf
+      - name: Setup - Substitute conf/app.yaml version
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'conf/app.yaml'
+        env:
+          version: ${{ env.DS_VERSION }}
+      - name: Build - Get Go dependencies
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+      - name: Build - Go Build
+        run: go build -o $DS_BUILD_DIR -v .
+        env:
+          GOOS: ${{ matrix.platform.os }}
+          GOARCH: ${{ matrix.platform.arch }}
+      - name: Build - Docker Build
+        run: docker build . --file Dockerfile --tag $DS_DOCKER_TAG
+      - name: Package - Docker Push
+        run: docker push $DS_DOCKER_TAG
