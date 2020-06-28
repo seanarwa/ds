@@ -87,6 +87,8 @@ jobs:
         run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
       - name: Setup - Set DS_DOCKER_TAG
         run: echo "::set-env name=DS_DOCKER_TAG::docker.pkg.github.com/$DS_GITHUB_REPO:$DS_VERSION"
+      - name: Setup - Login to Docker Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       - name: Setup - Create build directory
         run: mkdir -p $DS_BUILD_DIR
       - name: Setup - Move conf/ to build directory
