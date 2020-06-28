@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/seanarwa/ds/config"
+	"github.com/seanarwa/common/config"
 	"github.com/seanarwa/ds/db/mongo"
 )
 
