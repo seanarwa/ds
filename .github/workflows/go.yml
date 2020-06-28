@@ -14,8 +14,11 @@ jobs:
       DS_BUILD_DIR: ${{ github.workspace }}/build
     strategy:
       matrix:
-        os: [linux, windows]
-        arch: [386, amd64]
+        platform:
+          - os: windows
+            arch: amd64
+          - os: linux
+            arch: 386
     steps:
       - name: Setup Go 1.14
         uses: actions/setup-go@v2
@@ -36,8 +39,8 @@ jobs:
       - name: Go Build
         run: go build -o $DS_BUILD_DIR -v .
         env:
-          GOOS: ${{ matrix.os }}
-          GOARCH: ${{ matrix.arch }}
+          GOOS: ${{ matrix.platform.os }}
+          GOARCH: ${{ matrix.platform.arch }}
       - name: Move conf
         run: cp -rf conf $DS_BUILD_DIR/conf
       - name: Check build directory
