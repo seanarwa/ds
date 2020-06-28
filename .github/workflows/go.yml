@@ -14,6 +14,7 @@ jobs:
       DS_BUILD_DIR: ${{ github.workspace }}/build
     strategy:
       matrix:
+        go-version: [1.14.x]
         platform:
           - os: darwin
             arch: 386
@@ -32,10 +33,10 @@ jobs:
           - os: linux
             arch: arm64
     steps:
-      - name: Setup Go 1.14
+      - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.14
+          go-version: ${{ matrix.go-version }}
         id: go
       - name: Check out code
         uses: actions/checkout@v2
