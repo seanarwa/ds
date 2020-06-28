@@ -1,6 +1,10 @@
 FROM ubuntu:18.04
 
-COPY build /app
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+USER root
 
-ENTRYPOINT [ "bash /app/docker-entrypoint.sh" ]
+WORKDIR /app
+
+COPY build/ .
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+
+ENTRYPOINT [ "/bin/bash", "-c", "./docker-entrypoint.sh" ]
