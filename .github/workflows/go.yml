@@ -40,7 +40,18 @@ jobs:
       - name: Setup - Check out code
         uses: actions/checkout@v2
       - name: Setup - Set DS_VERSION
-        run: echo "::set-env name=DS_VERSION::$(cat ./VERSION)"
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+          
+          # Set DS_VERSION
+          echo "::set-env name=DS_VERSION::$VERSION"
       - name: Setup - Create build directory
         run: mkdir -p $DS_BUILD_DIR
       - name: Setup - Move conf/ to build directory
