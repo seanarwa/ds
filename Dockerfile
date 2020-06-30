@@ -1,10 +1,12 @@
-FROM ubuntu:18.04
+FROM golang:1.14
 
 USER root
 
-WORKDIR /app
+WORKDIR /go/src/app
+COPY . .
 
-COPY build/ .
-COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN go get -d -v ./...
+# RUN go install -v ./...
+RUN go build -v .
 
 ENTRYPOINT [ "/bin/bash", "-c", "./docker-entrypoint.sh" ]
