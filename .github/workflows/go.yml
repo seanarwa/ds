@@ -86,7 +86,7 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ env.DS_BUILD_DIR }}/*
+          file: ${{ env.DS_BUILD_DIR }}
           asset_name: ${{ env.DS_PACKAGE_NAME }}
           tag: ${{ github.ref }}
           overwrite: true
