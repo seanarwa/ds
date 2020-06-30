@@ -74,20 +74,19 @@ jobs:
         env:
           GOOS: ${{ matrix.platform.os }}
           GOARCH: ${{ matrix.platform.arch }}
+      - name: Package - Set DS_PACKAGE_NAME
+        run: echo "::set-env name=DS_PACKAGE_NAME::ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
       - name: Package - Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
+          name: ${{ env.DS_PACKAGE_NAME }}
           path: ${{ env.DS_BUILD_DIR }}/*
-  release:
-    name: Release
-    needs: [build]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload the artifacts
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package - Upload packages to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: svenstaro/upload-release-action@v1-release
         with:
-          args: '*'
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.DS_BUILD_DIR }}/*
+          asset_name: ${{ env.DS_PACKAGE_NAME }}
+          tag: ${{ github.ref }}
+          overwrite: true
