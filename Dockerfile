@@ -1,12 +1,11 @@
-FROM golang:1.14
+FROM alpine:3.12
 
 USER root
 
-WORKDIR /go/src/app
-COPY . .
+WORKDIR /app
+COPY build /app
 
-RUN go get -d -v ./...
-# RUN go install -v ./...
-RUN go build -v .
+COPY build/ .
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
 ENTRYPOINT [ "/bin/bash", "-c", "./docker-entrypoint.sh" ]
