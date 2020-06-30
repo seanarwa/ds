@@ -87,7 +87,7 @@ jobs:
       - name: Package - Get release
         if: startsWith(github.ref, 'refs/tags/v')
         id: get_release
-        uses: bruceadams/get-release@v1
+        uses: bruceadams/get-release@v1.2.0
       - name: Package - Upload packages to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1
