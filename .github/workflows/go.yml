@@ -83,7 +83,9 @@ jobs:
           path: ${{ env.DS_BUILD_DIR }}/*
       - name: Package - Zip release packages
         if: startsWith(github.ref, 'refs/tags/v')
-        run: zip -r ${{ env.DS_PACKAGE_NAME }}.zip ${{ env.DS_BUILD_DIR }}/*
+        run: |
+          cd ${{ env.DS_BUILD_DIR }}
+          zip -r ${{ env.DS_PACKAGE_NAME }}.zip ./*
       - name: Package - Get release
         if: startsWith(github.ref, 'refs/tags/v')
         id: get_release
