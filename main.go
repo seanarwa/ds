@@ -2,9 +2,13 @@ package main
 
 import (
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/seanarwa/common/config"
+	"github.com/seanarwa/ds/api"
 	"github.com/seanarwa/ds/db/mongo"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -20,7 +24,18 @@ func main() {
 	config.Set("cmd.config_file", configFile)
 	config.Init()
 
+	log.Info(config.GetString("name"), " v", config.GetString("version"), " has started")
+
 	mongo.Connect(config.GetString("db.mongo.url"))
-	mongo.Test()
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		api.Start()
+	}()
+
+	<-done
 	mongo.Disconnect()
+	log.Info(config.GetString("name"), " v", config.GetString("version"), " has stopped")
 }

@@ -42,7 +42,7 @@ func Disconnect() {
 	if err != nil {
 		log.Fatal("Error occured when trying to disconnect from MongoDB: ", err)
 	} else {
-		log.Debug("MongoDB client has disconnected to MongoDB")
+		log.Debug("MongoDB client has disconnected from MongoDB")
 	}
 }
 
