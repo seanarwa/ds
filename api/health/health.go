@@ -10,6 +10,6 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		util.WriteHTTPResponse(w, map[string]interface{}{
 			"health": "HEALTHY",
-		}, http.StatusAccepted)
+		}, http.StatusOK)
 	}
 }

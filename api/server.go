@@ -60,7 +60,7 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 		util.WriteHTTPResponse(w, map[string]interface{}{
 			"name":    config.GetString("name"),
 			"version": config.GetString("version"),
-		}, http.StatusAccepted)
+		}, http.StatusOK)
 	}
 }
 

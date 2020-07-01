@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/seanarwa/common/config"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,6 +45,16 @@ func Disconnect() {
 	} else {
 		log.Debug("MongoDB client has disconnected from MongoDB")
 	}
+}
+
+func getDefaultDatabase() *mongo.Database {
+	databaseName := config.GetString("db.mongo.database_name")
+	return mongoClient.Database(databaseName)
+}
+
+func getDefaultContext() context.Context {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	return ctx
 }
 
 func Test() {
