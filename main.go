@@ -24,16 +24,14 @@ func main() {
 	config.Set("cmd.config_file", configFile)
 	config.Init()
 
-	log.Info(config.GetString("name"), " v", config.GetString("version"), " has started")
+	log.Info(config.GetString("name"), " ", config.GetString("version"), " has started")
 
 	mongo.Connect(config.GetString("db.mongo.url"))
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	go func() {
-		api.Start()
-	}()
+	go api.Start()
 
 	<-done
 	mongo.Disconnect()

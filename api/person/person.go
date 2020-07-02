@@ -19,16 +19,16 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 
 	switch method {
 	case "GET":
-		get(w, req)
+		getMethod(w, req)
 		break
 	case "POST":
-		post(w, req)
+		postMethod(w, req)
 		break
 	case "PUT":
-		put(w, req)
+		putMethod(w, req)
 		break
 	case "DELETE":
-		delete(w, req)
+		deleteMethod(w, req)
 		break
 	default:
 		log.WithFields(log.Fields{
@@ -38,11 +38,23 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func get(w http.ResponseWriter, req *http.Request) {
-	util.WriteHTTPResponse(w, mongo.GetAll("person"), http.StatusOK)
+func getMethod(w http.ResponseWriter, req *http.Request) {
+	body, _ := ioutil.ReadAll(req.Body)
+	defer req.Body.Close()
+	var query bson.D
+	err := bson.UnmarshalExtJSON(body, false, &query)
+	if err != nil {
+		log.Error(err)
+	}
+	id := query.Map()["_id"]
+	if id == nil {
+		util.WriteHTTPResponse(w, mongo.GetAll("person"), http.StatusOK)
+	} else {
+		util.WriteHTTPResponse(w, mongo.FindOne("person", id.(string)), http.StatusOK)
+	}
 }
 
-func post(w http.ResponseWriter, req *http.Request) {
+func postMethod(w http.ResponseWriter, req *http.Request) {
 	body, _ := ioutil.ReadAll(req.Body)
 	defer req.Body.Close()
 	var query bson.D
@@ -56,10 +68,54 @@ func post(w http.ResponseWriter, req *http.Request) {
 	}, http.StatusOK)
 }
 
-func put(w http.ResponseWriter, req *http.Request) {
-
+func putMethod(w http.ResponseWriter, req *http.Request) {
+	body, _ := ioutil.ReadAll(req.Body)
+	defer req.Body.Close()
+	var query bson.D
+	err := bson.UnmarshalExtJSON(body, false, &query)
+	if err != nil {
+		log.Error(err)
+	}
+	id := query.Map()["_id"]
+	if id == nil {
+		log.Error("Error occured when trying to update one from MongoDB database: _id does not exist in body")
+		util.WriteHTTPResponse(w, map[string]interface{}{
+			"error": "_id does not exist in body",
+		}, http.StatusBadRequest)
+		return
+	}
+	for k, v := range query {
+		if v.Key == "_id" {
+			query = append(query[:k], query[k+1:]...)
+			break
+		}
+	}
+	result := mongo.UpdateOne("person", id.(string), query)
+	util.WriteHTTPResponse(w, map[string]interface{}{
+		"updated_id":   id.(string),
+		"update_count": result.ModifiedCount,
+	}, http.StatusOK)
 }
 
-func delete(w http.ResponseWriter, req *http.Request) {
-
+func deleteMethod(w http.ResponseWriter, req *http.Request) {
+	body, _ := ioutil.ReadAll(req.Body)
+	defer req.Body.Close()
+	var query bson.D
+	err := bson.UnmarshalExtJSON(body, false, &query)
+	if err != nil {
+		log.Error(err)
+	}
+	id := query.Map()["_id"]
+	if id == nil {
+		log.Error("Error occured when trying to delete one from MongoDB database: _id does not exist in body")
+		util.WriteHTTPResponse(w, map[string]interface{}{
+			"error": "_id does not exist in body",
+		}, http.StatusBadRequest)
+		return
+	}
+	result := mongo.DeleteOne("person", id.(string))
+	util.WriteHTTPResponse(w, map[string]interface{}{
+		"deleted_id":   id,
+		"delete_count": result.DeletedCount,
+	}, http.StatusOK)
 }

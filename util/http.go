@@ -1,8 +1,6 @@
 package util
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -21,19 +19,14 @@ func JSONStringify(obj interface{}) string {
 }
 
 func WriteHTTPResponse(w http.ResponseWriter, res interface{}, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
+	responseString := JSONStringify(res)
+	fmt.Fprintf(w, responseString)
 	log.WithFields(log.Fields{
 		"status_code": statusCode,
 	}).Debug("HTTP response sent")
-	fmt.Fprintf(w, JSONStringify(res))
-}
-
-func ToBytes(key interface{}) []byte {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(key)
-	if err != nil {
-		log.Error(err)
-	}
-	return buf.Bytes()
+	log.WithFields(log.Fields{
+		"response_body": responseString,
+	}).Trace()
 }
