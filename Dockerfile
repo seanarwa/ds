@@ -37,6 +37,5 @@ WORKDIR /app
 
 COPY --from=build $DS_BUILD_DIR .
 COPY ./conf/ ./conf/
-COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
-ENTRYPOINT [ "/bin/bash", "-c", "./docker-entrypoint.sh" ]
+CMD [ "./ds" ]
