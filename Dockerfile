@@ -10,7 +10,6 @@ FROM golang:1.14 AS build
 
 ARG DS_BUILD_DIR
 
-ENV DS_BUILD_DIR=$DS_BUILD_DIR
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV GO111MODULE=off
@@ -30,8 +29,6 @@ RUN go build -o $DS_BUILD_DIR -v .
 FROM alpine:3.12
 
 ARG DS_BUILD_DIR
-
-ENV DS_BUILD_DIR=$DS_BUILD_DIR
 
 RUN addgroup -S ds && adduser -S ds ds
 USER ds
