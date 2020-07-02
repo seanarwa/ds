@@ -24,7 +24,7 @@ RUN go build -o $DS_BUILD_DIR -v .
 # =============================================================================
 FROM alpine:3.12
 
-RUN addgroup -r ds && adduser -r -g ds ds
+RUN addgroup --system ds && adduser --system --group ds ds
 USER ds
 
 WORKDIR /app
