@@ -24,11 +24,6 @@ jobs:
       DS_DOCKER_IMAGE_NAME: ds
       DS_BUILD_DIR: ${{ github.workspace }}/build
     steps:
-      - name: Setup - Install Go 1.14.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.14.x
-        id: go
       - name: Setup - Check out code
         uses: actions/checkout@v2
       - name: Setup - Set DS_VERSION
@@ -48,28 +43,12 @@ jobs:
         run: echo "::set-env name=DS_DOCKER_TAG::$DS_DOCKER_REGISTRY/$DS_GITHUB_REPO/$DS_DOCKER_IMAGE_NAME:$DS_VERSION"
       - name: Setup - Login to Docker Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $DS_DOCKER_REGISTRY -u ${{ github.actor }} --password-stdin
-      - name: Setup - Create build directory
-        run: mkdir -p $DS_BUILD_DIR
-      - name: Setup - Move conf/ to build directory
-        run: cp -rf conf $DS_BUILD_DIR/conf
       - name: Setup - Substitute conf/app.yaml version
         uses: microsoft/variable-substitution@v1
         with:
           files: 'conf/app.yaml'
         env:
           version: ${{ env.DS_VERSION }}
-      - name: Build - Get Go dependencies
-        run: |
-          go get -v -t -d ./...
-          if [ -f Gopkg.toml ]; then
-              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-              dep ensure
-          fi
-      - name: Build - Go Build
-        run: go build -o $DS_BUILD_DIR -v .
-        env:
-          GOOS: linux
-          GOARCH: amd64
       - name: Build - Docker Build
         run: docker build . --file Dockerfile --tag $DS_DOCKER_TAG
       - name: Package - Docker Push

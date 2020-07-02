@@ -35,5 +35,5 @@ func main() {
 
 	<-done
 	mongo.Disconnect()
-	log.Info(config.GetString("name"), " v", config.GetString("version"), " has stopped")
+	log.Info(config.GetString("name"), " ", config.GetString("version"), " has stopped")
 }
