@@ -14,7 +14,7 @@ jobs:
       DS_BUILD_DIR: ${{ github.workspace }}/build
     strategy:
       matrix:
-        platform:
+        include:
           - os: darwin
             arch: 386
           - os: darwin
@@ -72,10 +72,10 @@ jobs:
       - name: Build - Go Build
         run: go build -o $DS_BUILD_DIR -v .
         env:
-          GOOS: ${{ matrix.platform.os }}
-          GOARCH: ${{ matrix.platform.arch }}
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
       - name: Package - Set DS_PACKAGE_NAME
-        run: echo "::set-env name=DS_PACKAGE_NAME::ds-${{ env.DS_VERSION }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
+        run: echo "::set-env name=DS_PACKAGE_NAME::ds-${{ env.DS_VERSION }}-${{ matrix.os }}-${{ matrix.arch }}"
       - name: Package - Upload artifacts
         uses: actions/upload-artifact@v2
         with:
