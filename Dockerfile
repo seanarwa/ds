@@ -8,6 +8,8 @@ ARG DS_BUILD_DIR=/bin/build
 # =============================================================================
 FROM golang:1.14 AS build
 
+ARG DS_BUILD_DIR
+
 ENV DS_BUILD_DIR=$DS_BUILD_DIR
 ENV GOOS=linux
 ENV GOARCH=amd64
@@ -26,6 +28,8 @@ RUN go build -o $DS_BUILD_DIR -v .
 # add static assets and copy binaries from build stage
 # =============================================================================
 FROM alpine:3.12
+
+ARG DS_BUILD_DIR
 
 ENV DS_BUILD_DIR=$DS_BUILD_DIR
 
